@@ -1,1 +1,626 @@
-cat /home/claude/alerta-segura-nuevo.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Alerta Segura – Pacasmayo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red:#e8001d;--red-dark:#a80015;--red-glow:rgba(232,0,29,0.35);
+    --dark:#0a0a0f;--dark2:#12121a;--dark3:#1c1c28;
+    --border:rgba(255,255,255,0.08);--text:#f0f0f0;--muted:#888;
+    --yellow:#ffc107;--green:#00c853;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--dark);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{
+    content:'⭐ EL APRA ESTÁ VIVO ⭐    TECNOLOGÍA Y SEGURIDAD    ⭐ EL APRA ESTÁ VIVO ⭐    TECNOLOGÍA Y SEGURIDAD    ⭐ EL APRA ESTÁ VIVO ⭐    TECNOLOGÍA Y SEGURIDAD    ⭐ EL APRA ESTÁ VIVO ⭐    TECNOLOGÍA Y SEGURIDAD    ⭐ EL APRA ESTÁ VIVO ⭐    TECNOLOGÍA Y SEGURIDAD';
+    position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+    font-size:15px;font-weight:900;color:rgba(200,160,0,0.055);
+    display:flex;align-items:center;justify-content:center;text-align:center;
+    word-spacing:12px;letter-spacing:2px;line-height:4;
+    transform:rotate(-30deg);pointer-events:none;z-index:0;
+    font-family:'Barlow',sans-serif;word-break:break-word;
+  }
+  .screen{display:none;min-height:100vh;flex-direction:column;position:relative;z-index:1;}
+  .screen.active{display:flex;}
+
+  .header{background:linear-gradient(160deg,#1a0005 0%,#0a0a0f 60%);padding:24px 20px 18px;text-align:center;border-bottom:1px solid var(--border);position:relative;}
+  .header::after{content:'';position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:80px;height:2px;background:var(--red);border-radius:2px;}
+  .logo-line{display:flex;align-items:center;justify-content:center;gap:10px;}
+  .logo-icon{width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 0 18px var(--red-glow);}
+  .app-name{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff;}
+  .app-sub{font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:3px;text-transform:uppercase;}
+  .city-badge{display:inline-flex;gap:6px;margin-top:8px;}
+  .badge{background:var(--dark3);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--muted);font-weight:600;}
+
+  .register-body{flex:1;padding:28px 24px;display:flex;flex-direction:column;overflow-y:auto;}
+  .section-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;margin-bottom:6px;}
+  .section-desc{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5;}
+  .field{margin-bottom:18px;}
+  .field label{display:block;font-size:12px;font-weight:700;letter-spacing:0.8px;color:var(--muted);text-transform:uppercase;margin-bottom:7px;}
+  .field input,.field select{width:100%;background:var(--dark3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;padding:13px 15px;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+  .field input:focus,.field select:focus{border-color:var(--red);}
+  .field select option{background:var(--dark3);}
+  .btn-primary{width:100%;padding:16px;background:var(--red);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;border:none;border-radius:12px;cursor:pointer;box-shadow:0 4px 24px var(--red-glow);transition:transform .1s;margin-top:8px;}
+  .btn-primary:active{transform:scale(0.97);}
+  .btn-secondary{width:100%;padding:13px;background:var(--dark3);color:var(--muted);font-family:'Barlow',sans-serif;font-size:14px;font-weight:700;border:1px solid var(--border);border-radius:12px;cursor:pointer;margin-top:10px;}
+  .error-msg{color:#ff4d6d;font-size:13px;font-weight:700;text-align:center;margin-top:8px;display:none;}
+  .pin-hint{font-size:11px;color:var(--muted);margin-top:6px;}
+
+  .install-banner{background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:12px;padding:14px 16px;margin-top:20px;}
+  .install-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px;}
+  .install-step{font-size:12px;color:var(--muted);line-height:1.9;}
+  .install-step span{color:var(--text);font-weight:700;}
+
+  .user-bar{display:flex;align-items:center;gap:10px;padding:14px 20px;background:var(--dark2);border-bottom:1px solid var(--border);}
+  .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;flex-shrink:0;}
+  .user-info{flex:1;}
+  .user-name{font-size:14px;font-weight:700;}
+  .user-phone{font-size:11px;color:var(--muted);}
+  .gps-status{display:flex;align-items:center;gap:5px;font-size:11px;}
+  .gps-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:blink 1.5s infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+  .main-body{flex:1;padding:22px 20px;display:flex;flex-direction:column;align-items:center;gap:20px;overflow-y:auto;}
+  .alert-label{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);align-self:flex-start;}
+  .alert-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;}
+  .alert-type{background:var(--dark3);border:2px solid var(--border);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:6px;}
+  .alert-type .icon{font-size:22px;}
+  .alert-type .name{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .alert-type.selected{border-color:var(--red);background:rgba(232,0,29,0.12);box-shadow:0 0 14px rgba(232,0,29,0.2);}
+  .alert-type.selected .name{color:#fff;}
+
+  .panic-wrap{position:relative;display:flex;align-items:center;justify-content:center;margin:4px 0;}
+  .panic-ring{position:absolute;width:200px;height:200px;border-radius:50%;border:2px solid rgba(232,0,29,0.2);animation:ring-pulse 2s ease-out infinite;}
+  .panic-ring:nth-child(2){animation-delay:0.6s;}
+  .panic-ring:nth-child(3){animation-delay:1.2s;}
+  @keyframes ring-pulse{0%{transform:scale(0.85);opacity:0.6}100%{transform:scale(1.35);opacity:0}}
+  .panic-btn{position:relative;z-index:2;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff1a35,#a80015);border:4px solid rgba(255,255,255,0.15);box-shadow:0 0 40px rgba(232,0,29,0.5),0 8px 30px rgba(0,0,0,0.5);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;transition:transform .15s;user-select:none;}
+  .panic-btn:active{transform:scale(0.93);}
+  .panic-icon{font-size:38px;}
+  .panic-text{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#fff;}
+  .panic-sub{font-size:10px;color:rgba(255,255,255,0.7);letter-spacing:0.5px;}
+
+  .contacts-row{display:flex;gap:10px;width:100%;}
+  .contact-btn{flex:1;padding:12px 8px;background:var(--dark3);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;text-decoration:none;transition:border-color .2s;}
+  .contact-btn:active{border-color:var(--yellow);}
+  .contact-btn .c-icon{font-size:20px;}
+  .contact-btn .c-name{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;text-align:center;}
+  .contact-btn .c-num{font-size:14px;font-weight:900;color:var(--text);}
+
+  #screen-sending{background:var(--dark);align-items:center;justify-content:center;gap:24px;padding:40px 24px;text-align:center;}
+  .spinner-wrap{position:relative;width:120px;height:120px;}
+  .spinner{width:120px;height:120px;border-radius:50%;border:3px solid var(--dark3);border-top-color:var(--red);animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner-icon{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;}
+  .sending-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:2px;}
+  .sending-sub{font-size:14px;color:var(--muted);line-height:1.6;max-width:280px;}
+  .loc-info{background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:14px 18px;width:100%;text-align:left;}
+  .loc-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:13px;}
+  .loc-row:last-child{margin-bottom:0;}
+  .loc-key{color:var(--muted);font-weight:600;}
+  .loc-val{font-weight:700;color:var(--text);max-width:180px;text-align:right;font-size:12px;}
+
+  #screen-success{background:var(--dark);align-items:center;justify-content:center;gap:16px;padding:24px 20px;text-align:center;overflow-y:auto;}
+  .success-icon{font-size:56px;animation:pop .4s ease;}
+  @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+  .success-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--green);}
+  .success-sub{font-size:13px;color:var(--muted);line-height:1.6;max-width:300px;}
+  .success-card{background:var(--dark3);border:1px solid rgba(0,200,83,0.25);border-radius:14px;padding:14px 16px;width:100%;text-align:left;}
+  .sc-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .sc-row:last-child{border-bottom:none;}
+  .sc-row .sc-icon{font-size:16px;flex-shrink:0;}
+  .sc-row .sc-text{flex:1;color:var(--muted);}
+  .sc-row .sc-val{font-weight:700;color:var(--text);}
+  .btn-whatsapp{width:100%;padding:15px;background:#25D366;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;border:none;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;}
+  .map-container{width:100%;border-radius:14px;overflow:hidden;border:2px solid rgba(0,200,83,0.3);}
+  .map-container iframe{width:100%;height:220px;border:none;display:block;}
+  .map-label{background:rgba(0,200,83,0.15);border-bottom:1px solid rgba(0,200,83,0.2);padding:8px 12px;font-size:12px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:6px;}
+  .map-link{display:block;background:rgba(0,200,83,0.1);border-top:1px solid rgba(0,200,83,0.2);padding:10px 14px;text-align:center;font-size:12px;font-weight:700;color:var(--green);text-decoration:none;}
+  .btn-back{width:100%;padding:14px;background:var(--dark3);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;cursor:pointer;}
+
+  .bottom-nav{display:flex;background:var(--dark2);border-top:1px solid var(--border);padding:10px 0 calc(10px + env(safe-area-inset-bottom));}
+  .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0;}
+  .nav-btn .ni{font-size:20px;}
+  .nav-btn .nl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .nav-btn.active .nl{color:var(--red);}
+
+  #screen-history{background:var(--dark);}
+  .history-body{flex:1;padding:20px;overflow-y:auto;}
+  .hist-empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:14px;}
+  .hist-item{background:var(--dark3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px;display:flex;gap:12px;align-items:flex-start;}
+  .hist-badge{width:40px;height:40px;border-radius:10px;background:rgba(232,0,29,0.2);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .hist-info{flex:1;}
+  .hist-type{font-size:13px;font-weight:700;}
+  .hist-date{font-size:11px;color:var(--muted);margin-top:3px;}
+  .hist-loc{font-size:11px;color:var(--muted);margin-top:2px;}
+  .hist-map{display:inline-block;margin-top:6px;font-size:11px;font-weight:700;color:var(--green);text-decoration:none;background:rgba(0,200,83,0.1);padding:3px 8px;border-radius:6px;}
+  .hist-status{font-size:11px;font-weight:700;color:var(--green);}
+
+  #screen-central{background:var(--dark);}
+  .central-body{flex:1;padding:20px;overflow-y:auto;}
+  .central-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .live-badge{display:flex;align-items:center;gap:5px;background:rgba(232,0,29,0.15);border:1px solid rgba(232,0,29,0.3);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--red);}
+  .alert-card{background:var(--dark3);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+  .ac-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .ac-icon{font-size:24px;}
+  .ac-info{flex:1;}
+  .ac-type{font-size:14px;font-weight:700;}
+  .ac-time{font-size:11px;color:var(--muted);}
+  .ac-urgent{background:rgba(232,0,29,0.2);border:1px solid rgba(232,0,29,0.4);border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--red);}
+  .ac-body{display:flex;flex-direction:column;gap:5px;}
+  .ac-row{display:flex;gap:8px;font-size:12px;}
+  .ac-lbl{color:var(--muted);min-width:60px;}
+  .ac-val{font-weight:600;}
+  .ac-map{display:block;width:100%;margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid rgba(0,200,83,0.25);}
+  .ac-map iframe{width:100%;height:160px;border:none;display:block;}
+  .ac-actions{display:flex;gap:8px;margin-top:12px;}
+  .ac-btn{flex:1;padding:9px;border-radius:8px;border:none;font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;cursor:pointer;}
+  .ac-btn.police{background:rgba(33,150,243,0.2);color:#64b5f6;border:1px solid rgba(33,150,243,0.3);}
+  .ac-btn.fire{background:rgba(255,152,0,0.2);color:#ffb74d;border:1px solid rgba(255,152,0,0.3);}
+  .ac-btn.serenazgo{background:rgba(0,200,83,0.15);color:#66bb6a;border:1px solid rgba(0,200,83,0.25);}
+
+  .creator-footer{text-align:center;padding:10px 16px 14px;background:var(--dark2);border-top:1px solid var(--border);flex-shrink:0;}
+  .creator-footer .cf-line{font-size:11px;color:var(--muted);letter-spacing:0.4px;line-height:1.6;}
+  .creator-footer .cf-name{font-weight:700;color:var(--text);font-size:12px;letter-spacing:0.5px;}
+  .creator-footer .cf-party{display:inline-flex;align-items:center;gap:5px;margin-top:3px;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:#c8a000;letter-spacing:0.5px;}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--dark2);border:1px solid var(--border);border-radius:18px;padding:24px;width:100%;max-width:340px;}
+  .modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1.5px;margin-bottom:8px;}
+  .modal-body{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+  .modal-actions{display:flex;gap:10px;}
+  .modal-btn{flex:1;padding:13px;border-radius:10px;border:none;font-family:'Barlow',sans-serif;font-weight:700;font-size:14px;cursor:pointer;}
+  .modal-btn.cancel{background:var(--dark3);color:var(--muted);}
+  .modal-btn.confirm{background:var(--red);color:#fff;}
+
+  /* Login */
+  .login-center{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 24px;overflow-y:auto;}
+  .login-avatar-wrap{text-align:center;margin-bottom:24px;}
+  .login-big-avatar{width:72px;height:72px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:34px;margin:0 auto 12px;box-shadow:0 0 24px var(--red-glow);}
+  .login-welcome{font-size:20px;font-weight:700;}
+  .login-hint{font-size:13px;color:var(--muted);margin-top:4px;}
+  .pin-big{text-align:center;font-size:30px;letter-spacing:10px;}
+</style>
+</head>
+<body>
+
+<!-- REGISTER -->
+<div id="screen-register" class="screen active">
+  <div class="header">
+    <div class="logo-line"><div class="logo-icon">🚨</div><span class="app-name">ALERTA SEGURA</span></div>
+    <div class="app-sub">Sistema de emergencias ciudadanas</div>
+    <div class="city-badge"><span class="badge">📍 Pacasmayo</span></div>
+  </div>
+  <div class="register-body">
+    <div class="section-title">Crear tu perfil</div>
+    <div class="section-desc">Tus datos se enviarán automáticamente con cada alerta para que los servicios de emergencia puedan ayudarte más rápido.</div>
+    <div class="field"><label>Nombre completo</label><input type="text" id="reg-name" placeholder="Ej. Juan Pérez García" autocomplete="name"></div>
+    <div class="field"><label>Teléfono</label><input type="tel" id="reg-phone" placeholder="Ej. 944 123 456" autocomplete="tel"></div>
+    <div class="field"><label>Dirección referencial</label><input type="text" id="reg-address" placeholder="Ej. Jr. Grau 245, Pacasmayo"></div>
+    <div class="field">
+      <label>Zona / Distrito</label>
+      <select id="reg-city">
+        <option value="Pacasmayo">Pacasmayo</option>
+        <option value="San Pedro de Lloc">San Pedro de Lloc</option>
+        <option value="Guadalupe">Guadalupe</option>
+        <option value="Jequetepeque">Jequetepeque</option>
+        <option value="Otra">Otra zona</option>
+      </select>
+    </div>
+    <div class="error-msg" id="reg-error">Por favor ingresa tu nombre y teléfono.</div>
+    <button class="btn-primary" onclick="register()">REGISTRARME →</button>
+
+    <div class="install-banner">
+      <div class="install-title">📲 Guarda la app en tu celular</div>
+      <div class="install-step">
+        📱 <span>Android:</span> toca los 3 puntitos ⋮ del navegador → "Añadir a pantalla de inicio"<br>
+        🍎 <span>iPhone:</span> toca el botón compartir ⬆️ → "Añadir a pantalla de inicio"
+      </div>
+    </div>
+  </div>
+  <div class="creator-footer">
+    <div class="cf-line">Creado por: <span class="cf-name">MARIO ALEGRÍA</span></div>
+    <div class="cf-party">⭐ Partido Aprista Peruano</div>
+  </div>
+</div>
+
+
+
+<!-- MAIN -->
+<div id="screen-main" class="screen">
+  <div class="header">
+    <div class="logo-line"><div class="logo-icon">🚨</div><span class="app-name">ALERTA SEGURA</span></div>
+    <div class="app-sub">Pacasmayo</div>
+  </div>
+  <div class="user-bar">
+    <div class="user-avatar" id="avatar-letter">J</div>
+    <div class="user-info">
+      <div class="user-name" id="disp-name">—</div>
+      <div class="user-phone" id="disp-phone">—</div>
+    </div>
+    <div class="gps-status"><div class="gps-dot"></div><span style="color:var(--muted);font-size:11px;">GPS</span></div>
+  </div>
+  <div class="main-body">
+    <div class="alert-label">Tipo de alerta</div>
+    <div class="alert-types">
+      <div class="alert-type selected" onclick="selectAlert(this,'🔫','Robo / Asalto')"><div class="icon">🔫</div><div class="name">Robo</div></div>
+      <div class="alert-type" onclick="selectAlert(this,'💰','Extorsión')"><div class="icon">💰</div><div class="name">Extorsión</div></div>
+      <div class="alert-type" onclick="selectAlert(this,'🎯','Sicariato')"><div class="icon">🎯</div><div class="name">Sicariato</div></div>
+      <div class="alert-type" onclick="selectAlert(this,'🔥','Incendio')"><div class="icon">🔥</div><div class="name">Incendio</div></div>
+      <div class="alert-type" onclick="selectAlert(this,'🚗','Accidente')"><div class="icon">🚗</div><div class="name">Accidente</div></div>
+      <div class="alert-type" onclick="selectAlert(this,'⚠️','Otra emergencia')"><div class="icon">⚠️</div><div class="name">Otros</div></div>
+      <div class="alert-type" onclick="selectAlert(this,'👊','Violencia Familiar')"><div class="icon">👊</div><div class="name">Viol. Familiar</div></div>
+    </div>
+    <div class="panic-wrap">
+      <div class="panic-ring"></div><div class="panic-ring"></div><div class="panic-ring"></div>
+      <div class="panic-btn" onclick="showConfirm()">
+        <div class="panic-icon">🆘</div>
+        <div class="panic-text">¡PÁNICO!</div>
+        <div class="panic-sub">Presiona para alertar</div>
+      </div>
+    </div>
+    <div class="contacts-row">
+      <a class="contact-btn" href="tel:105"><div class="c-icon">🚓</div><div class="c-name">Policía</div><div class="c-num">105</div></a>
+      <a class="contact-btn" href="tel:116"><div class="c-icon">🚒</div><div class="c-name">Bomberos</div><div class="c-num">116</div></a>
+      <a class="contact-btn" href="tel:106"><div class="c-icon">🚑</div><div class="c-name">SAMU</div><div class="c-num">106</div></a>
+      <a class="contact-btn" href="tel:0800112000"><div class="c-icon">🛡️</div><div class="c-name">Serenazgo</div><div class="c-num">0800</div></a>
+    </div>
+    <div class="contacts-row">
+      <a class="contact-btn" href="tel:100" style="border-color:rgba(255,105,180,0.35);background:rgba(255,105,180,0.07);flex:1;">
+        <div class="c-icon">💜</div>
+        <div class="c-name" style="color:#e879a0;">Centro Emergencia Mujer</div>
+        <div class="c-num" style="color:#f472b6;">Línea 100</div>
+      </a>
+    </div>
+    <div style="width:100%;text-align:center;">
+      <button id="btn-install" onclick="installApp()" style="display:none;padding:7px 14px;background:transparent;color:#00c853;font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;border:1px solid rgba(0,200,83,0.3);border-radius:20px;cursor:pointer;">
+        📲 Guardar en pantalla de inicio
+      </button>
+      <div id="ios-install" style="display:none;font-size:11px;color:#666;line-height:1.8;">
+        📲 Guardar: toca <strong style="color:#aaa;">⬆️ Compartir</strong> → <strong style="color:#aaa;">"Añadir a pantalla de inicio"</strong>
+      </div>
+    </div>
+  </div>
+  <div class="creator-footer">
+    <div class="cf-line">Creado por: <span class="cf-name">MARIO ALEGRÍA</span></div>
+    <div class="cf-party">⭐ Partido Aprista Peruano</div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-btn active" onclick="showTab('main',this)"><div class="ni">🏠</div><div class="nl">Inicio</div></div>
+    <div class="nav-btn" onclick="showTab('history',this)"><div class="ni">📋</div><div class="nl">Historial</div></div>
+    <div class="nav-btn" onclick="showTab('central',this)"><div class="ni">📡</div><div class="nl">Central</div></div>
+  </div>
+</div>
+
+<!-- SENDING -->
+<div id="screen-sending" class="screen">
+  <div class="spinner-wrap"><div class="spinner"></div><div class="spinner-icon">📡</div></div>
+  <div class="sending-title">ENVIANDO ALERTA</div>
+  <div class="sending-sub">Obteniendo tu ubicación GPS y notificando a la central...</div>
+  <div class="loc-info">
+    <div class="loc-row"><span class="loc-key">👤 Nombre</span><span class="loc-val" id="si-name">—</span></div>
+    <div class="loc-row"><span class="loc-key">📞 Teléfono</span><span class="loc-val" id="si-phone">—</span></div>
+    <div class="loc-row"><span class="loc-key">⚠️ Alerta</span><span class="loc-val" id="si-type">—</span></div>
+    <div class="loc-row"><span class="loc-key">📍 Ubicación</span><span class="loc-val" id="si-loc">Obteniendo GPS...</span></div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="screen-success" class="screen">
+  <div class="success-icon">✅</div>
+  <div class="success-title">¡ALERTA ENVIADA!</div>
+  <div class="success-sub">La central ha recibido tu alerta y está enviando ayuda a tu ubicación.</div>
+  <div class="map-container" id="map-container" style="display:none;width:100%;">
+    <div class="map-label">🗺️ Tu ubicación en el mapa</div>
+    <iframe id="map-frame" src="" allowfullscreen loading="lazy"></iframe>
+    <a id="map-link" href="#" target="_blank" class="map-link">📍 Abrir en Google Maps →</a>
+  </div>
+  <div class="success-card">
+    <div class="sc-row"><div class="sc-icon">📡</div><div class="sc-text">Central notificada</div><div class="sc-val" style="color:var(--green)">✓ Recibido</div></div>
+    <div class="sc-row"><div class="sc-icon">🚓</div><div class="sc-text">Policía Nacional</div><div class="sc-val" id="suc-police">Coordinando</div></div>
+    <div class="sc-row"><div class="sc-icon">🚒</div><div class="sc-text">Bomberos</div><div class="sc-val" id="suc-fire">En espera</div></div>
+    <div class="sc-row"><div class="sc-icon">📍</div><div class="sc-text">Coordenadas GPS</div><div class="sc-val" id="suc-loc" style="font-size:11px">—</div></div>
+    <div class="sc-row"><div class="sc-icon">⏱️</div><div class="sc-text">Hora de alerta</div><div class="sc-val" id="suc-time">—</div></div>
+  </div>
+  <a id="btn-whatsapp" href="#" target="_blank" class="btn-whatsapp">💬 Enviar por WhatsApp</a>
+  <button class="btn-back" onclick="backToMain()">← VOLVER AL INICIO</button>
+</div>
+
+<!-- HISTORY -->
+<div id="screen-history" class="screen">
+  <div class="header">
+    <div class="logo-line"><div class="logo-icon">📋</div><span class="app-name">MI HISTORIAL</span></div>
+    <div class="app-sub">Pacasmayo</div>
+  </div>
+  <div class="history-body" id="history-list">
+    <div class="hist-empty">No has enviado alertas aún.<br>Esperamos que nunca las necesites. 🙏</div>
+  </div>
+  <div class="creator-footer">
+    <div class="cf-line">Creado por: <span class="cf-name">MARIO ALEGRÍA</span></div>
+    <div class="cf-party">⭐ Partido Aprista Peruano</div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-btn" onclick="showTab('main',this)"><div class="ni">🏠</div><div class="nl">Inicio</div></div>
+    <div class="nav-btn active" onclick="showTab('history',this)"><div class="ni">📋</div><div class="nl">Historial</div></div>
+    <div class="nav-btn" onclick="showTab('central',this)"><div class="ni">📡</div><div class="nl">Central</div></div>
+  </div>
+</div>
+
+<!-- CENTRAL -->
+<div id="screen-central" class="screen">
+  <div class="header">
+    <div class="logo-line"><div class="logo-icon">📡</div><span class="app-name">CENTRAL DE EMERGENCIAS</span></div>
+    <div class="app-sub">Vista para operadores — Pacasmayo</div>
+  </div>
+  <div class="central-body">
+    <div class="central-header">
+      <div class="section-title" style="margin:0">Alertas activas</div>
+      <div class="live-badge"><span style="width:6px;height:6px;background:var(--red);border-radius:50%;display:inline-block;animation:blink 1s infinite"></span> EN VIVO</div>
+    </div>
+    <div id="central-alerts">
+      <div class="alert-card">
+        <div class="ac-top">
+          <div class="ac-icon">🔫</div>
+          <div class="ac-info"><div class="ac-type">Robo / Asalto</div><div class="ac-time">Hace 2 min</div></div>
+          <div class="ac-urgent">URGENTE</div>
+        </div>
+        <div class="ac-body">
+          <div class="ac-row"><span class="ac-lbl">👤 Nombre:</span><span class="ac-val">María López</span></div>
+          <div class="ac-row"><span class="ac-lbl">📞 Tel:</span><span class="ac-val">944 211 333</span></div>
+          <div class="ac-row"><span class="ac-lbl">📍 Ubic.:</span><span class="ac-val">Jr. Independencia, Pacasmayo</span></div>
+        </div>
+        <div class="ac-map">
+          <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=-79.5300,-7.4050,-79.5100,-7.3950&layer=mapnik&marker=-7.4000,-79.5200" allowfullscreen></iframe>
+        </div>
+        <div class="ac-actions">
+          <button class="ac-btn police" onclick="dispatch('Policía','Robo / Asalto')">🚓 Policía</button>
+          <button class="ac-btn fire" onclick="dispatch('Bomberos','Robo / Asalto')">🚒 Bomberos</button>
+          <button class="ac-btn serenazgo" onclick="dispatch('Serenazgo','Robo / Asalto')">🛡️ Serenazgo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="creator-footer">
+    <div class="cf-line">Creado por: <span class="cf-name">MARIO ALEGRÍA</span></div>
+    <div class="cf-party">⭐ Partido Aprista Peruano</div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-btn" onclick="showTab('main',this)"><div class="ni">🏠</div><div class="nl">Inicio</div></div>
+    <div class="nav-btn" onclick="showTab('history',this)"><div class="ni">📋</div><div class="nl">Historial</div></div>
+    <div class="nav-btn active" onclick="showTab('central',this)"><div class="ni">📡</div><div class="nl">Central</div></div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-title">⚠️ Confirmar alerta</div>
+    <div class="modal-body">¿Deseas enviar una alerta de <strong id="confirm-type">Robo / Asalto</strong> con tu ubicación GPS a la central de emergencias de Pacasmayo?</div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeConfirm()">Cancelar</button>
+      <button class="modal-btn confirm" onclick="sendAlert()">¡ENVIAR AHORA!</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const WA_NUMBER = '51946918375';
+  let user = JSON.parse(localStorage.getItem('alerta_user') || 'null');
+  let alerts = JSON.parse(localStorage.getItem('alerta_history') || '[]');
+  let selectedType = { icon: '🔫', name: 'Robo / Asalto' };
+
+  // Si ya está registrado, entrar directo
+  if (user) { populateUser(); renderHistory(); showScreen('main'); }
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(() => {}, () => {}, { timeout: 3000 });
+  }
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function showTab(tab, btn) {
+    showScreen(tab);
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      if (b.textContent.toLowerCase().includes(btn.querySelector('.nl').textContent.toLowerCase())) b.classList.add('active');
+    });
+  }
+
+  function register() {
+    const name    = document.getElementById('reg-name').value.trim();
+    const phone   = document.getElementById('reg-phone').value.trim();
+    const address = document.getElementById('reg-address').value.trim();
+    const city    = document.getElementById('reg-city').value;
+    const errEl   = document.getElementById('reg-error');
+    if (!name || !phone) { errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+    user = { name, phone, address, city };
+    localStorage.setItem('alerta_user', JSON.stringify(user));
+    populateUser(); renderHistory(); showScreen('main');
+  }
+
+  function populateUser() {
+    if (!user) return;
+    document.getElementById('disp-name').textContent = user.name;
+    document.getElementById('disp-phone').textContent = user.phone + ' · ' + user.city;
+    document.getElementById('avatar-letter').textContent = user.name.charAt(0).toUpperCase();
+  }
+
+  function selectAlert(el, icon, name) {
+    document.querySelectorAll('.alert-type').forEach(a => a.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedType = { icon, name };
+  }
+
+  function showConfirm() {
+    document.getElementById('confirm-type').textContent = selectedType.icon + ' ' + selectedType.name;
+    document.getElementById('confirm-modal').classList.add('open');
+  }
+  function closeConfirm() { document.getElementById('confirm-modal').classList.remove('open'); }
+
+  function sendAlert() {
+    closeConfirm();
+    document.getElementById('si-name').textContent = user.name;
+    document.getElementById('si-phone').textContent = user.phone;
+    document.getElementById('si-type').textContent = selectedType.icon + ' ' + selectedType.name;
+    document.getElementById('si-loc').textContent = 'Obteniendo GPS...';
+    showScreen('sending');
+
+    const onGPS = (lat, lon, locText) => {
+      document.getElementById('si-loc').textContent = locText;
+      setTimeout(() => showSuccess(lat, lon, locText), 2500);
+    };
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lon = pos.coords.longitude.toFixed(5);
+        onGPS(lat, lon, lat + ', ' + lon);
+      }, () => {
+        onGPS('-7.40110', '-79.52220', user.address || 'Pacasmayo (referencial)');
+      }, { timeout: 6000 });
+    } else {
+      onGPS('-7.40110', '-79.52220', user.address || 'Pacasmayo (referencial)');
+    }
+  }
+
+  function showSuccess(lat, lon, locText) {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString('es-PE');
+
+    document.getElementById('suc-loc').textContent = locText;
+    document.getElementById('suc-time').textContent = timeStr + ' · ' + dateStr;
+
+    const policeTypes = ['Robo / Asalto','Extorsión','Sicariato','Violencia Familiar'];
+    document.getElementById('suc-police').textContent = policeTypes.includes(selectedType.name) ? '🚔 Despachado' : 'Notificado';
+    document.getElementById('suc-fire').textContent = selectedType.name === 'Incendio' ? '🚒 Despachado' : 'En espera';
+
+    if (lat && lat !== '—') {
+      const delta = 0.005;
+      const bbox = `${parseFloat(lon)-delta},${parseFloat(lat)-delta},${parseFloat(lon)+delta},${parseFloat(lat)+delta}`;
+      document.getElementById('map-frame').src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lon}`;
+      document.getElementById('map-link').href = `https://www.google.com/maps?q=${lat},${lon}`;
+      document.getElementById('map-container').style.display = 'block';
+    }
+
+    // WhatsApp
+    const mapsLink = (lat && lat !== '—') ? `https://www.google.com/maps?q=${lat},${lon}` : 'GPS no disponible';
+    const waMsg = encodeURIComponent(
+      `🚨 *ALERTA SEGURA – PACASMAYO* 🚨\n\n` +
+      `⚠️ *Tipo:* ${selectedType.icon} ${selectedType.name}\n` +
+      `👤 *Nombre:* ${user.name}\n` +
+      `📞 *Teléfono:* ${user.phone}\n` +
+      `📍 *Zona:* ${user.city}\n` +
+      `🗺️ *Ubicación GPS:* ${locText}\n` +
+      `🔗 *Ver en mapa:* ${mapsLink}\n` +
+      `⏱️ *Hora:* ${timeStr} · ${dateStr}\n\n` +
+      `_Enviado desde Alerta Segura – Pacasmayo_`
+    );
+    document.getElementById('btn-whatsapp').href = `https://wa.me/${WA_NUMBER}?text=${waMsg}`;
+
+    const entry = { type: selectedType.name, icon: selectedType.icon, loc: locText, lat, lon, time: timeStr, date: dateStr };
+    alerts.unshift(entry);
+    localStorage.setItem('alerta_history', JSON.stringify(alerts));
+    renderHistory(); addToCentral(entry); showScreen('success');
+  }
+
+  function backToMain() { showScreen('main'); }
+
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    if (alerts.length === 0) {
+      list.innerHTML = '<div class="hist-empty">No has enviado alertas aún.<br>Esperamos que nunca las necesites. 🙏</div>';
+      return;
+    }
+    list.innerHTML = alerts.map(a => {
+      const mapBtn = (a.lat && a.lat !== '—') ? `<a class="hist-map" href="https://www.google.com/maps?q=${a.lat},${a.lon}" target="_blank">🗺️ Ver en mapa</a>` : '';
+      return `<div class="hist-item">
+        <div class="hist-badge">${a.icon}</div>
+        <div class="hist-info">
+          <div class="hist-type">${a.type}</div>
+          <div class="hist-date">📅 ${a.date} · ⏱️ ${a.time}</div>
+          <div class="hist-loc">📍 ${a.loc}</div>
+          ${mapBtn}
+          <div class="hist-status" style="margin-top:4px">✓ Enviada a central</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  renderHistory();
+
+  function addToCentral(entry) {
+    const container = document.getElementById('central-alerts');
+    const card = document.createElement('div');
+    card.className = 'alert-card';
+    card.style.border = '1px solid rgba(232,0,29,0.4)';
+    let mapHTML = '';
+    if (entry.lat && entry.lat !== '—') {
+      const delta = 0.005;
+      const lat = parseFloat(entry.lat), lon = parseFloat(entry.lon);
+      const bbox = `${lon-delta},${lat-delta},${lon+delta},${lat+delta}`;
+      mapHTML = `<div class="ac-map"><iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${entry.lat},${entry.lon}" allowfullscreen></iframe></div>
+      <a href="https://www.google.com/maps?q=${entry.lat},${entry.lon}" target="_blank" style="display:block;text-align:center;padding:8px;font-size:12px;color:var(--green);font-weight:700;text-decoration:none;">📍 Abrir en Google Maps →</a>`;
+    }
+    card.innerHTML = `
+      <div class="ac-top">
+        <div class="ac-icon">${entry.icon}</div>
+        <div class="ac-info"><div class="ac-type">${entry.type}</div><div class="ac-time">Ahora mismo</div></div>
+        <div class="ac-urgent">NUEVO</div>
+      </div>
+      <div class="ac-body">
+        <div class="ac-row"><span class="ac-lbl">👤 Nombre:</span><span class="ac-val">${user.name}</span></div>
+        <div class="ac-row"><span class="ac-lbl">📞 Tel:</span><span class="ac-val">${user.phone}</span></div>
+        <div class="ac-row"><span class="ac-lbl">📍 GPS:</span><span class="ac-val">${entry.loc}</span></div>
+      </div>
+      ${mapHTML}
+      <div class="ac-actions">
+        <button class="ac-btn police" onclick="dispatch('Policía','${entry.type}')">🚓 Policía</button>
+        <button class="ac-btn fire" onclick="dispatch('Bomberos','${entry.type}')">🚒 Bomberos</button>
+        <button class="ac-btn serenazgo" onclick="dispatch('Serenazgo','${entry.type}')">🛡️ Serenazgo</button>
+      </div>`;
+    container.insertBefore(card, container.firstChild);
+  }
+
+  function dispatch(service, type) {
+    alert('✅ ' + service + ' despachado para: ' + type);
+  }
+
+  // ── INSTALAR COMO APP ──
+  let deferredPrompt = null;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+  if (!isInStandalone) {
+    if (isIOS) {
+      document.getElementById('ios-install').style.display = 'block';
+    } else {
+      window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('btn-install').style.display = 'flex';
+      });
+    }
+  }
+
+  function installApp() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => {
+        deferredPrompt = null;
+        document.getElementById('btn-install').style.display = 'none';
+      });
+    }
+  }
+</script>
+</body>
+</html>
+
