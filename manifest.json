@@ -1,0 +1,15 @@
+{
+  "name": "Alerta Segura Pacasmayo",
+  "short_name": "Alerta Segura",
+  "start_url": "/alerta-segura/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#e8001d",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192x192/e8001d/ffffff?text=AS",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
